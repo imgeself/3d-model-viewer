@@ -10,7 +10,7 @@ public:
   Shader();
   ~Shader();
 
-  GLuint program;
+  GLuint mProgram;
 };
 
 #endif

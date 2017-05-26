@@ -4,19 +4,20 @@
  * Since we are using only two shaders for this program, we can hardcode them in here.
  */
 const GLchar *vertexShaderSource = R"(
-#version 300
-layout (location = 0) in vec3 position;
+#version 330 core
+layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
-layout (location = 2) in vec2 texCoord;
+
+uniform mat4 model;
 
 void main()
 {
-gl_Position(position, 1.0f);
+gl_Position = model * vec4(pos, 1.0f);
 }
 )";
 
 const GLchar *fragmentShaderSource = R"(
-#version 300
+#version 330 core
 out vec4 color;
 
 void main()
@@ -50,14 +51,14 @@ Shader::Shader()
     std::cout << "Error at compiling fragment shader:\n" << info << "\n";
   }
   
-  this->program = glCreateProgram();
-  glAttachShader(this->program, vertexShader);
-  glAttachShader(this->program, fragmentShader);
-  glLinkProgram(this->program);
+  mProgram = glCreateProgram();
+  glAttachShader(mProgram, vertexShader);
+  glAttachShader(mProgram, fragmentShader);
+  glLinkProgram(mProgram);
 
-  glGetProgramiv(this->program, GL_LINK_STATUS, &success);
+  glGetProgramiv(mProgram, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(this->program, 512, NULL, info);
+    glGetProgramInfoLog(mProgram, 512, NULL, info);
     std::cout << "Error at linking shader program:\n" << info << "\n";
   }
 

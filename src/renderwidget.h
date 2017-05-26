@@ -15,6 +15,7 @@ public:
 private:
   void resize(int width, int height);
   bool render(const Glib::RefPtr<Gdk::GLContext> &context);
+  void realize();
 };
 
 #endif

@@ -29,7 +29,7 @@ CFLAGS += $(shell pkg-config --cflags gtkmm-3.0)
 CFLAGS += -std=c++11
 
 LIBS += $(shell pkg-config --libs gtkmm-3.0)
-LIBS += -lGL -lGLEW
+LIBS += -lGL -lGLEW -lassimp
 
 $(BUILDDIR)/%.o : $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)

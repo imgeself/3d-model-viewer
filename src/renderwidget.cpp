@@ -1,9 +1,14 @@
 #include "renderwidget.h"
+#include "renderer.h"
+
+Renderer renderer = Renderer::getInstance();
 
 RenderWidget::RenderWidget()
 {
   signal_resize().connect(sigc::mem_fun(*this, &RenderWidget::resize));
-  signal_render().connect(sigc::mem_fun(*this, &RenderWidget::render));  
+  signal_render().connect(sigc::mem_fun(*this, &RenderWidget::render));
+  signal_realize().connect(sigc::mem_fun(*this, &RenderWidget::realize));
+
 }
 
 RenderWidget::~RenderWidget()
@@ -13,11 +18,25 @@ RenderWidget::~RenderWidget()
 
 void RenderWidget::resize(int width, int height)
 {
-  glViewport(0,0,width,height);
+  renderer.resize(width,height);
 }  
 
 bool RenderWidget::render(const Glib::RefPtr<Gdk::GLContext> &context)
 {
-  glClearColor(0.2f,0.3f,0.2f,1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-}  
+  renderer.render();
+  return true;
+}
+
+void RenderWidget::realize()
+{
+  make_current();
+
+  
+  Model model("../object/nanosuit.obj");
+  Scene scene;
+  scene.mModels.push_back(model);
+
+  renderer.setActiveScene(scene);
+  renderer.prepare();
+}
+  
