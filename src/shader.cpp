@@ -8,11 +8,9 @@ const GLchar *vertexShaderSource = R"(
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 
-uniform mat4 model;
-
 void main()
 {
-gl_Position = model * vec4(pos, 1.0f);
+gl_Position = vec4(pos, 1.0f);
 }
 )";
 

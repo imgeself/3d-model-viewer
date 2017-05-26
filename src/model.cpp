@@ -7,12 +7,10 @@
 
 #include <glm/glm.hpp>
 
-#define AI_CONFIG_PP_PTV_NORMALIZE   "PP_PTV_NORMALIZE"
-
-
 Model::Model(const char *filename)
-{
+{ 
   Assimp::Importer import;
+  import.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,1);
   const aiScene* scene = import.ReadFile(filename, aiProcess_OptimizeMeshes | aiProcess_PreTransformVertices | aiProcess_Triangulate);
   if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
   {
