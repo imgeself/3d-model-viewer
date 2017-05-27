@@ -68,6 +68,22 @@ void Renderer::prepare()
     }
   }
 
+  Light light;
+  light.position = glm::vec3(1.0f, 2.0f, -1.0f);
+  light.color = glm::vec3(1.0f);
+  light.ambientStrength = 0.2f;
+
+  mActiveScene.mainLight = light;
+
+  //We put this code in prepare bu later we might put in render
+  GLuint lightPosLoc = glGetUniformLocation(shader.mProgram, "lightPos");
+  GLuint lightColorLoc = glGetUniformLocation(shader.mProgram, "lightColor");
+  GLuint ambStrenLoc = glGetUniformLocation(shader.mProgram, "ambientStrength");
+
+  glUniform3fv(lightPosLoc, 1, glm::value_ptr(mActiveScene.mainLight.position));
+  glUniform3fv(lightColorLoc, 1, glm::value_ptr(mActiveScene.mainLight.color));
+  glUniform1f(ambStrenLoc, mActiveScene.mainLight.ambientStrength);
+  
 }
 
 void Renderer::render()

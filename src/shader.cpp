@@ -24,9 +24,14 @@ in vec4 oColor;
 
 out vec4 color;
 
+uniform vec3 lightPos;
+uniform vec3 lightColor;
+uniform float ambientStrength;
+
 void main()
 {
-color = oColor;
+vec3 ambient = ambientStrength * lightColor;
+color = vec4 (ambient * oColor.xyz, oColor.w);
 }
 )";
 
