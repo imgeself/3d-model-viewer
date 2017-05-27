@@ -26,7 +26,7 @@ Model::~Model()
 
 }
 
-void Model::iterateNode(aiNode *node, const aiScene *scene)
+void Model::iterateNode(const aiNode *node, const aiScene *scene)
 {
 
   for (int i = 0; i < node->mNumMeshes; i++) {
@@ -40,7 +40,7 @@ void Model::iterateNode(aiNode *node, const aiScene *scene)
 
 }
 
-Mesh Model::loadMesh(aiMesh *asMesh, const aiScene *scene)
+Mesh Model::loadMesh(const aiMesh *asMesh, const aiScene *scene)
 {
   std::vector<Vertex> vertices;
 
@@ -57,6 +57,18 @@ Mesh Model::loadMesh(aiMesh *asMesh, const aiScene *scene)
     vect3.z = asMesh->mNormals[i].z;
     vertex.nor = vect3;
 
+    if (asMesh->mColors[0]) {
+      glm::vec4 vect4;
+      vect4.x = asMesh->mColors[0][i].r;
+      vect4.y = asMesh->mColors[0][i].g;
+      vect4.z = asMesh->mColors[0][i].b;
+      vect4.w = asMesh->mColors[0][i].a;
+
+      vertex.color = vect4;
+    } else {
+      vertex.color = glm::vec4(1.0f);
+    }
+    
     vertices.push_back(vertex);
   }
 

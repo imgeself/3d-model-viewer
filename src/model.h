@@ -18,8 +18,8 @@ public:
   std::vector<Mesh> mMeshes;
 
 private:
-  Mesh loadMesh(aiMesh*, const aiScene*);
-  void iterateNode(aiNode*, const aiScene*);
+  Mesh loadMesh(const aiMesh*, const aiScene*);
+  void iterateNode(const aiNode*, const aiScene*);
 };
 
 #endif
