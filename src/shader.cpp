@@ -10,17 +10,28 @@ layout (location = 1) in vec4 color;
 layout (location = 2) in vec3 normal;
 
 out vec4 oColor;
+out vec3 oNormal;
+out vec3 oFragPos;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-gl_Position = vec4(pos, 1.0f);
+gl_Position = projection * view * model * vec4(pos, 1.0f);
+
 oColor = color;
+oFragPos = vec3(model * vec4(pos, 1.0f));
+oNormal = normal;
 }
 )";
 
 const GLchar *fragmentShaderSource = R"(
 #version 330 core
 in vec4 oColor;
+in vec3 oNormal;
+in vec3 oFragPos;
 
 out vec4 color;
 
@@ -30,12 +41,22 @@ uniform float ambientStrength;
 
 void main()
 {
-vec3 ambient = ambientStrength * lightColor;
-color = vec4 (ambient * oColor.xyz, oColor.w);
+
+vec3 norm = normalize(oNormal);
+vec3 lightDir = normalize(lightPos - oFragPos);
+float light = max(dot(norm, lightDir), ambientStrength);
+vec3 diffuse = light * lightColor;
+
+color = vec4 (diffuse * oColor.xyz, oColor.w);
 }
 )";
 
 Shader::Shader()
+{
+    
+}
+
+void Shader::compileShadersAndProgram()
 {
   GLint success;
   GLchar info[512];
@@ -73,7 +94,7 @@ Shader::Shader()
 
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);  
-    
+  
 }
 
 Shader::~Shader()

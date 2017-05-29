@@ -11,7 +11,7 @@ Model::Model(const char *filename)
 { 
   Assimp::Importer import;
   import.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,1);
-  const aiScene* scene = import.ReadFile(filename, aiProcess_OptimizeMeshes | aiProcess_PreTransformVertices | aiProcess_Triangulate);
+  const aiScene* scene = import.ReadFile(filename, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_PreTransformVertices | aiProcess_Triangulate);
   if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
   {
     std::cout << "Error at loading model: " << import.GetErrorString() << "\n";

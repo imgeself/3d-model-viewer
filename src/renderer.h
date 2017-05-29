@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "scene.h"
+#include <memory>
 
 class Renderer {
 

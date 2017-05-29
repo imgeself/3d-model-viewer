@@ -9,6 +9,7 @@ class Shader {
 public:
   Shader();
   ~Shader();
+  void compileShadersAndProgram();
 
   GLuint mProgram;
 };

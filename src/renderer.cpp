@@ -1,8 +1,16 @@
 #include "renderer.h"
 #include "shader.h"
+#include <chrono>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+GLuint projLoc;
+GLuint modelLoc;
+GLuint viewLoc;
+
+auto start = std::chrono::high_resolution_clock::now();
+Shader shader;
 
 Renderer::Renderer()
 {
@@ -11,7 +19,7 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-  //glDeleteProgram(mShader.mProgram);
+  glDeleteProgram(shader.mProgram);
   
   for (Model &model : mActiveScene.mModels) {
     for (Mesh &mesh : model.mMeshes) {
@@ -21,12 +29,14 @@ Renderer::~Renderer()
     }
   }
   
+  
 }
 
 void Renderer::setActiveScene(Scene &scene)
 {
   mActiveScene = scene;
 }  
+
 
 void Renderer::prepare()
 {
@@ -36,10 +46,13 @@ void Renderer::prepare()
   if (GLEW_OK != err) {
     std::cout <<  "Error at initializing glew.\n" << glewGetErrorString(err) << "\n";
   }
+  glEnable(GL_DEPTH_TEST);
  
-  Shader shader;
+  //Shader have open gl functions. So we have to compile shaders after initilazing glew.
+  shader.compileShadersAndProgram();
+  
   glUseProgram(shader.mProgram);
-
+  
   for (Model &model : mActiveScene.mModels) {
     for (Mesh &mesh : model.mMeshes) {
       glGenVertexArrays(1, &mesh.mVAO);
@@ -50,10 +63,10 @@ void Renderer::prepare()
 
       glBindBuffer(GL_ARRAY_BUFFER, mesh.mVBO);
       glBufferData(GL_ARRAY_BUFFER, mesh.mVertices.size() * sizeof(Vertex), &mesh.mVertices[0], GL_STATIC_DRAW);
-
+      
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.mEBO);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.mIndices.size() * sizeof(GLuint), &mesh.mIndices[0], GL_STATIC_DRAW);
-
+      
       glEnableVertexAttribArray(0);
       glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, pos));
 
@@ -68,10 +81,11 @@ void Renderer::prepare()
     }
   }
 
+  
   Light light;
-  light.position = glm::vec3(1.0f, 2.0f, -1.0f);
+  light.position = glm::vec3(0.0f, 2.0f, 2.0f);
   light.color = glm::vec3(1.0f);
-  light.ambientStrength = 0.2f;
+  light.ambientStrength = 0.4f;
 
   mActiveScene.mainLight = light;
 
@@ -83,15 +97,33 @@ void Renderer::prepare()
   glUniform3fv(lightPosLoc, 1, glm::value_ptr(mActiveScene.mainLight.position));
   glUniform3fv(lightColorLoc, 1, glm::value_ptr(mActiveScene.mainLight.color));
   glUniform1f(ambStrenLoc, mActiveScene.mainLight.ambientStrength);
+
+  viewLoc = glGetUniformLocation(shader.mProgram, "view");
+  modelLoc = glGetUniformLocation(shader.mProgram, "model");
+  projLoc = glGetUniformLocation(shader.mProgram, "projection");
   
 }
+
 
 void Renderer::render()
 {
   glClearColor(0.2f,0.2f,0.2f,1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //glUseProgram(mShader.mProgram);
+  auto now = std::chrono::high_resolution_clock::now();
+  float time = std::chrono::duration_cast<std::chrono::duration<float>>(now - start).count();
+
+  glUseProgram(shader.mProgram);
+  
+  glm::mat4 model;  
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+  
+  glm::mat4 view;
+  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+
   
   for (Model &model : mActiveScene.mModels) {
     for (Mesh &mesh : model.mMeshes) {
@@ -101,10 +133,15 @@ void Renderer::render()
     }
   }
 
-  //glUseProgram(0);
+  glUseProgram(0);
 }  
-  
+
+
 void Renderer::resize(int width, int height)
 {
   glViewport(0, 0, width, height);
+  glUseProgram(shader.mProgram);
+  glm::mat4 projection = glm::perspective(glm::radians(85.0f), (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
+  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+  glUseProgram(0);
 }  

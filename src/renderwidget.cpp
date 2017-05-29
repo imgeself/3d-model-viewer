@@ -24,13 +24,14 @@ void RenderWidget::resize(int width, int height)
 bool RenderWidget::render(const Glib::RefPtr<Gdk::GLContext> &context)
 {
   renderer.render();
+  queue_render();
   return true;
 }
 
 void RenderWidget::realize()
 {
   make_current();
-
+  set_has_depth_buffer(true);
   
   Model model("../object/nanosuit.obj");
   Scene scene;
