@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "shader.h"
+#include "camera.h"
 
 #include <glm/glm.hpp>
 
@@ -14,6 +15,7 @@ struct Light {
 };
 
 struct Scene {
+  Camera mainCamera;
   Light mainLight;
   Model *mModel = nullptr;
 };

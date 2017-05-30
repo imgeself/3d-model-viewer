@@ -109,7 +109,7 @@ void Renderer::render()
 
   
   glm::mat4 view;
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.5f));
+  view = glm::lookAt(mActiveScene.mainCamera.getPosition(), mActiveScene.mainCamera.getTarget(), mActiveScene.mainCamera.getUp());
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
   glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mActiveScene.mModel->getModelMatrix()));

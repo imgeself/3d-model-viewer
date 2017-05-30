@@ -4,6 +4,7 @@
 Renderer renderer = Renderer::getInstance();
 Scene scene;
 Model model("../object/nanosuit.obj");
+Camera camera;
 
 RenderWidget::RenderWidget()
 {
@@ -39,6 +40,7 @@ void RenderWidget::realize()
   set_has_depth_buffer(true);
   
   scene.mModel = &model;
+  scene.mainCamera = camera;
 
   renderer.setActiveScene(scene);
   renderer.prepare();
