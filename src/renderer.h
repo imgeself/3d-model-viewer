@@ -14,6 +14,7 @@ public:
     return instance;
   };
   void prepare();
+  void cleanUp();
   void render();
   void resize(int width, int height);
   void setActiveScene(Scene &scene);

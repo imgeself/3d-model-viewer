@@ -1,7 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <vector>
 #include "model.h"
 #include "shader.h"
 
@@ -16,7 +15,7 @@ struct Light {
 
 struct Scene {
   Light mainLight;
-  std::vector<Model> mModels;
+  Model *mModel = nullptr;
 };
 
 #endif

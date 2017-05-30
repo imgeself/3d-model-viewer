@@ -5,8 +5,6 @@
 
 #include <GL/glew.h>
 
-#include <glm/glm.hpp>
-
 Model::Model(const char *filename)
 { 
   Assimp::Importer import;
@@ -86,4 +84,19 @@ Mesh Model::loadMesh(const aiMesh *asMesh, const aiScene *scene)
 
   return mesh;
   
+}  
+
+void Model::rotateHorizontally(float angle)
+{
+  modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+void Model::rotateVertically(float angle)
+{
+  modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));  
+}  
+
+glm::mat4 Model::getModelMatrix()
+{
+  return modelMatrix;
 }  

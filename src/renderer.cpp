@@ -8,6 +8,7 @@
 GLuint projLoc;
 GLuint modelLoc;
 GLuint viewLoc;
+GLuint inversedModelLoc;
 
 auto start = std::chrono::high_resolution_clock::now();
 Shader shader;
@@ -19,16 +20,6 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-  glDeleteProgram(shader.mProgram);
-  
-  for (Model &model : mActiveScene.mModels) {
-    for (Mesh &mesh : model.mMeshes) {
-      glDeleteVertexArrays(1, &mesh.mVAO);
-      glDeleteBuffers(1, &mesh.mVBO);
-      glDeleteBuffers(1, &mesh.mEBO);
-    }
-  }
-  
   
 }
 
@@ -53,32 +44,31 @@ void Renderer::prepare()
   
   glUseProgram(shader.mProgram);
   
-  for (Model &model : mActiveScene.mModels) {
-    for (Mesh &mesh : model.mMeshes) {
-      glGenVertexArrays(1, &mesh.mVAO);
-      glGenBuffers(1, &mesh.mVBO);
-      glGenBuffers(1, &mesh.mEBO);
+ 
+  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+    glGenVertexArrays(1, &mesh.mVAO);
+    glGenBuffers(1, &mesh.mVBO);
+    glGenBuffers(1, &mesh.mEBO);
 
-      glBindVertexArray(mesh.mVAO);
+    glBindVertexArray(mesh.mVAO);
 
-      glBindBuffer(GL_ARRAY_BUFFER, mesh.mVBO);
-      glBufferData(GL_ARRAY_BUFFER, mesh.mVertices.size() * sizeof(Vertex), &mesh.mVertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.mVBO);
+    glBufferData(GL_ARRAY_BUFFER, mesh.mVertices.size() * sizeof(Vertex), &mesh.mVertices[0], GL_STATIC_DRAW);
       
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.mEBO);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.mIndices.size() * sizeof(GLuint), &mesh.mIndices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.mEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.mIndices.size() * sizeof(GLuint), &mesh.mIndices[0], GL_STATIC_DRAW);
+     
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, pos));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
       
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, pos));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, nor));
 
-      glEnableVertexAttribArray(1);
-      glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-      
-      glEnableVertexAttribArray(2);
-      glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, nor));
+    glBindVertexArray(0);
 
-      glBindVertexArray(0);
-
-    }
   }
 
   
@@ -101,7 +91,7 @@ void Renderer::prepare()
   viewLoc = glGetUniformLocation(shader.mProgram, "view");
   modelLoc = glGetUniformLocation(shader.mProgram, "model");
   projLoc = glGetUniformLocation(shader.mProgram, "projection");
-  
+  inversedModelLoc = glGetUniformLocation(shader.mProgram, "inversedModel");
 }
 
 
@@ -115,22 +105,22 @@ void Renderer::render()
 
   glUseProgram(shader.mProgram);
   
-  glm::mat4 model;  
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
 
   
   glm::mat4 view;
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.5f));
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mActiveScene.mModel->getModelMatrix()));
 
-  
-  for (Model &model : mActiveScene.mModels) {
-    for (Mesh &mesh : model.mMeshes) {
-      glBindVertexArray(mesh.mVAO);
-      glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
-      glBindVertexArray(0);
-    }
+  glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mModel->getModelMatrix())));
+  glUniformMatrix3fv(inversedModelLoc, 1, GL_FALSE, glm::value_ptr(inversedModel));
+
+  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+    glBindVertexArray(mesh.mVAO);
+    glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
   }
 
   glUseProgram(0);
@@ -141,7 +131,19 @@ void Renderer::resize(int width, int height)
 {
   glViewport(0, 0, width, height);
   glUseProgram(shader.mProgram);
-  glm::mat4 projection = glm::perspective(glm::radians(85.0f), (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(glm::radians(50.0f), (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
   glUseProgram(0);
+}  
+
+void Renderer::cleanUp()
+{
+  glDeleteProgram(shader.mProgram);
+  
+  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+    glDeleteVertexArrays(1, &mesh.mVAO);
+    glDeleteBuffers(1, &mesh.mVBO);
+    glDeleteBuffers(1, &mesh.mEBO);
+  }
+ 
 }  

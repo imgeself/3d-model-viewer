@@ -17,13 +17,15 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform mat3 inversedModel;
+
 void main()
 {
 gl_Position = projection * view * model * vec4(pos, 1.0f);
 
 oColor = color;
 oFragPos = vec3(model * vec4(pos, 1.0f));
-oNormal = normal;
+oNormal = inversedModel * normal;
 }
 )";
 
