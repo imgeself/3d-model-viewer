@@ -73,7 +73,7 @@ void Renderer::prepare()
 
   
   Light light;
-  light.position = glm::vec3(0.0f, 2.0f, 2.0f);
+  light.position = glm::vec3(0.0f, 1.0f, 3.0f);
   light.color = glm::vec3(1.0f);
   light.ambientStrength = 0.4f;
 

@@ -17,6 +17,7 @@ private:
   void unrealize();
   bool onButtonClicked(GdkEventButton *event);
   bool onMouseScrolled(GdkEventMotion *event);
+  bool onWheelScrolled(GdkEventScroll *event);
 };
 
 #endif

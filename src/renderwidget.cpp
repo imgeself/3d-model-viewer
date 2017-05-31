@@ -8,7 +8,7 @@ Camera camera;
 
 RenderWidget::RenderWidget()
 {
-  add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK);
+  add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_MOTION_MASK | Gdk::SCROLL_MASK);
   
   signal_resize().connect(sigc::mem_fun(*this, &RenderWidget::resize));
   signal_render().connect(sigc::mem_fun(*this, &RenderWidget::render));
@@ -16,6 +16,7 @@ RenderWidget::RenderWidget()
   signal_unrealize().connect(sigc::mem_fun(*this, &RenderWidget::unrealize));
   signal_button_press_event().connect(sigc::mem_fun(*this, &RenderWidget::onButtonClicked));
   signal_motion_notify_event().connect(sigc::mem_fun(*this, &RenderWidget::onMouseScrolled));
+  signal_scroll_event().connect(sigc::mem_fun(*this, &RenderWidget::onWheelScrolled));
 }
 
 RenderWidget::~RenderWidget()
@@ -72,7 +73,7 @@ bool RenderWidget::onButtonClicked(GdkEventButton *event)
   
 bool RenderWidget::onMouseScrolled(GdkEventMotion *event)
 {
-  float sensitivity = 0.7f;
+  float sensitivity = 0.6f;
   // left click
   if (clickedButton == 1) {
     float xoffset = event->x - clickX;
@@ -84,7 +85,32 @@ bool RenderWidget::onMouseScrolled(GdkEventMotion *event)
     
   }
   // right click
-  else if(clickedButton == 3) {
+  else if (clickedButton == 3) {
+    float yoffset = clickY - event->y;
+    float xoffset = event->x - clickX;
+    clickY = event->y;
+    clickX = event->x;
+    
+    float speed = 0.01f;
+    xoffset *= sensitivity * speed;
+    yoffset *= sensitivity * speed;
+
+    if (xoffset > 0) {
+      camera.move(RIGHTWARD, xoffset);
+    } else if (xoffset < 0){
+      camera.move(LEFTWARD, -xoffset);
+    }  
+    
+    if (yoffset > 0) {
+      camera.move(UPWARD, yoffset);
+    } else if (yoffset < 0){
+      camera.move(DOWNWARD, -yoffset);
+    }
+    
+  }  
+  
+  // middle click
+  else if (clickedButton == 2) {
     float yoffset = clickY - event->y;
     clickY = event->y;
   
@@ -96,5 +122,18 @@ bool RenderWidget::onMouseScrolled(GdkEventMotion *event)
   
   queue_render();
 
+  return false;
+}  
+
+bool RenderWidget::onWheelScrolled(GdkEventScroll *event)
+{
+  float speed = 0.25f;
+  if (event->direction == GDK_SCROLL_UP) {
+    camera.move(FORWARD, speed);
+  } else if (event->direction == GDK_SCROLL_DOWN) {
+    camera.move(BACKWARD, speed);
+  }
+ 
+  queue_render();
   return false;
 }  

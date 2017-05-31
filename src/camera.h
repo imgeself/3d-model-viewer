@@ -3,11 +3,19 @@
 
 #include <glm/glm.hpp>
 
+enum CameraDirection {
+  FORWARD,
+  BACKWARD,
+  DOWNWARD,
+  UPWARD,
+  RIGHTWARD,
+  LEFTWARD,
+};  
+
 class Camera {
 public:
-  void moveForward(float speed = 1);
-  void moveBackward(float speed = 1);
-
+  void move(CameraDirection dir, float speed);
+  
   glm::vec3 getTarget();
   glm::vec3 getUp();
   glm::vec3 getPosition();
