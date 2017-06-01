@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <string>
+#include <unordered_map>
 
 enum TextureType {
   DIFFUSE,
@@ -14,6 +15,7 @@ private:
   GLuint mId;
   TextureType mType;
   std::string mPath;
+  static std::unordered_map<std::string, GLuint> mTexturePool;
 
 public:
   Texture(std::string path, TextureType type);
@@ -22,5 +24,7 @@ public:
   TextureType getType();
   std::string getPath();
 };
+
+std::unordered_map<std::string, GLuint> Texture::mTexturePool;
 
 #endif
