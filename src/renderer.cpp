@@ -10,7 +10,6 @@ GLuint modelLoc;
 GLuint viewLoc;
 GLuint inversedModelLoc;
 
-auto start = std::chrono::high_resolution_clock::now();
 Shader shader;
 
 Renderer::Renderer()
@@ -66,16 +65,23 @@ void Renderer::prepare()
       
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, nor));
+    
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texCoords));
 
     glBindVertexArray(0);
+
+    for (Texture &texture : mesh.mTextures) {
+      texture.load();
+    }
 
   }
 
   
   Light light;
   light.position = glm::vec3(0.0f, 1.0f, 3.0f);
-  light.color = glm::vec3(1.0f);
-  light.ambientStrength = 0.4f;
+  light.color = glm::vec3(1.5f);
+  light.ambientStrength = 0.5f;
 
   mActiveScene.mainLight = light;
 
@@ -100,13 +106,7 @@ void Renderer::render()
   glClearColor(0.2f,0.2f,0.2f,1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  auto now = std::chrono::high_resolution_clock::now();
-  float time = std::chrono::duration_cast<std::chrono::duration<float>>(now - start).count();
-
   glUseProgram(shader.mProgram);
-  
-
-
   
   glm::mat4 view;
   view = glm::lookAt(mActiveScene.mainCamera.getPosition(), mActiveScene.mainCamera.getTarget(), mActiveScene.mainCamera.getUp());
@@ -118,8 +118,25 @@ void Renderer::render()
   glUniformMatrix3fv(inversedModelLoc, 1, GL_FALSE, glm::value_ptr(inversedModel));
 
   for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+
+    for(int i = 0; i < mesh.mTextures.size(); i++) {
+      Texture texture = mesh.mTextures[i];
+
+      const char *name;
+      glActiveTexture(GL_TEXTURE0 + i);
+      switch (texture.getType()) {
+      case DIFFUSE:
+	name = "texture_diffuse";
+	break;
+      }
+      
+      glUniform1i(glGetUniformLocation(shader.mProgram, name), i);
+      glBindTexture(GL_TEXTURE_2D, texture.getId());
+    }
+    
     glBindVertexArray(mesh.mVAO);
     glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
   }
 

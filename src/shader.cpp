@@ -8,10 +8,12 @@ const GLchar *vertexShaderSource = R"(
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec4 color;
 layout (location = 2) in vec3 normal;
+layout (location = 3) in vec2 texCoords;
 
 out vec4 oColor;
 out vec3 oNormal;
 out vec3 oFragPos;
+out vec2 oTexCoords;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -26,6 +28,7 @@ gl_Position = projection * view * model * vec4(pos, 1.0f);
 oColor = color;
 oFragPos = vec3(model * vec4(pos, 1.0f));
 oNormal = inversedModel * normal;
+oTexCoords = texCoords;
 }
 )";
 
@@ -34,6 +37,7 @@ const GLchar *fragmentShaderSource = R"(
 in vec4 oColor;
 in vec3 oNormal;
 in vec3 oFragPos;
+in vec2 oTexCoords;
 
 out vec4 color;
 
@@ -41,13 +45,15 @@ uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform float ambientStrength;
 
+uniform sampler2D texture_diffuse;
+
 void main()
 {
 
 vec3 norm = normalize(oNormal);
 vec3 lightDir = normalize(lightPos - oFragPos);
-float light = max(dot(norm, lightDir), ambientStrength);
-vec3 diffuse = light * lightColor;
+float diff = max(dot(norm, lightDir), ambientStrength);
+vec3 diffuse = diff * lightColor * vec3(texture(texture_diffuse, oTexCoords));
 
 color = vec4 (diffuse * oColor.xyz, oColor.w);
 }

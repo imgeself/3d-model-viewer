@@ -3,6 +3,7 @@
 
 #include "mesh.h"
 #include <vector>
+#include <string>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -16,7 +17,7 @@
 class Model {
 
 public:
-  Model(const char* filename);
+  Model(std::string filename);
   ~Model();
 
   std::vector<Mesh> mMeshes;
@@ -25,9 +26,11 @@ public:
   glm::mat4 getModelMatrix();
   
 private:
-  glm::mat4 modelMatrix;
+  std::string mCurrentFolder;
+  glm::mat4 mModelMatrix;
   Mesh loadMesh(const aiMesh*, const aiScene*);
   void iterateNode(const aiNode*, const aiScene*);
+  std::vector<Texture> getTextures(const aiMaterial *material, TextureType textureType);
 };
 
 #endif
