@@ -5,7 +5,8 @@
 #include <string>
 
 enum TextureType {
-  DIFFUSE
+  DIFFUSE,
+  SPECULAR
 };
 
 class Texture {

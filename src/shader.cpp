@@ -48,6 +48,7 @@ uniform float ambientStrength;
 uniform vec3 cameraPos;
 
 uniform sampler2D texture_diffuse;
+uniform sampler2D texture_specular;
 
 float specularStrength = 0.5f;
 
@@ -62,7 +63,7 @@ vec3 diffuse = diff * lightColor * vec3(texture(texture_diffuse, oTexCoords));
 vec3 viewDir = normalize(cameraPos - oFragPos);
 vec3 reflectDir = reflect(-lightDir, norm);
 float spec = pow(max(dot(viewDir, reflectDir),0.0),64);
-vec3 specular = specularStrength * spec * lightColor;
+vec3 specular = specularStrength * spec * lightColor * vec3(texture(texture_specular, oTexCoords));
 
 color = vec4 ((diffuse + specular) * oColor.xyz, oColor.w);
 }

@@ -95,6 +95,9 @@ Mesh Model::loadMesh(const aiMesh *asMesh, const aiScene *scene)
     aiMaterial *material = scene->mMaterials[asMesh->mMaterialIndex];
     std::vector<Texture> diffuseMaps = getTextures(material, DIFFUSE);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+    std::vector<Texture> specularMaps = getTextures(material, SPECULAR);
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
   }
   
   
@@ -114,6 +117,9 @@ std::vector<Texture> Model::getTextures(const aiMaterial *material, TextureType 
   switch (textureType) {
   case DIFFUSE:
     type = aiTextureType_DIFFUSE;
+    break;
+  case SPECULAR:
+    type = aiTextureType_SPECULAR;
     break;
   }
 

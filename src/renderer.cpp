@@ -127,6 +127,9 @@ void Renderer::render()
       case DIFFUSE:
 	name = "texture_diffuse";
 	break;
+      case SPECULAR:
+	name = "texture_specular";
+	break;
       }
       
       glUniform1i(glGetUniformLocation(shader.mProgram, name), i);
