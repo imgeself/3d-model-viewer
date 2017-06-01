@@ -5,11 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-GLuint projLoc;
-GLuint modelLoc;
-GLuint viewLoc;
-GLuint inversedModelLoc;
-
+GLuint projLoc, modelLoc, viewLoc, inversedModelLoc, cameraPosLoc;
 Shader shader;
 
 Renderer::Renderer()
@@ -98,6 +94,7 @@ void Renderer::prepare()
   modelLoc = glGetUniformLocation(shader.mProgram, "model");
   projLoc = glGetUniformLocation(shader.mProgram, "projection");
   inversedModelLoc = glGetUniformLocation(shader.mProgram, "inversedModel");
+  cameraPosLoc = glGetUniformLocation(shader.mProgram, "cameraPos");
 }
 
 
@@ -113,6 +110,8 @@ void Renderer::render()
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
   glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mActiveScene.mModel->getModelMatrix()));
+
+  glUniform3fv(cameraPosLoc, 1, glm::value_ptr(mActiveScene.mainCamera.getPosition()));
 
   glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mModel->getModelMatrix())));
   glUniformMatrix3fv(inversedModelLoc, 1, GL_FALSE, glm::value_ptr(inversedModel));
