@@ -110,9 +110,11 @@ void Renderer::render()
       switch (texture.getType()) {
       case DIFFUSE:
 	name = "texture_diffuse";
+	shader.set("hasDiffuseMap", true);
 	break;
       case SPECULAR:
 	name = "texture_specular";
+	shader.set("hasSpecularMap", true);
 	break;
       }
       

@@ -47,7 +47,10 @@ uniform float ambientStrength;
 
 uniform vec3 cameraPos;
 
+uniform bool hasDiffuseMap;
 uniform sampler2D texture_diffuse;
+
+uniform bool hasSpecularMap;
 uniform sampler2D texture_specular;
 
 float specularStrength = 0.5f;
@@ -58,12 +61,20 @@ void main()
 vec3 norm = normalize(oNormal);
 vec3 lightDir = normalize(lightPos - oFragPos);
 float diff = max(dot(norm, lightDir), ambientStrength);
-vec3 diffuse = diff * lightColor * vec3(texture(texture_diffuse, oTexCoords));
+
+vec3 diffuse = diff * lightColor;
+if (hasDiffuseMap) {
+  diffuse *= vec3(texture(texture_diffuse, oTexCoords));
+}
 
 vec3 viewDir = normalize(cameraPos - oFragPos);
 vec3 reflectDir = reflect(-lightDir, norm);
 float spec = pow(max(dot(viewDir, reflectDir),0.0),64);
-vec3 specular = specularStrength * spec * lightColor * vec3(texture(texture_specular, oTexCoords));
+
+vec3 specular = specularStrength * spec * lightColor;
+if (hasSpecularMap) {
+  specular *= vec3(texture(texture_specular, oTexCoords));
+}
 
 color = vec4 ((diffuse + specular) * oColor.xyz, oColor.w);
 }

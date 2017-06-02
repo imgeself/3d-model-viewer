@@ -95,7 +95,7 @@ Mesh Model::loadMesh(const aiMesh *asMesh, const aiScene *scene)
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     std::vector<Texture> specularMaps = getTextures(material, SPECULAR);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
   }
   
   

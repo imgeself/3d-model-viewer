@@ -28,6 +28,9 @@ public:
   void set(const char *name, int value) {
     glUniform1i(glGetUniformLocation(mProgram, name), value);
   };
+  void set(const char *name, bool value) {
+    glUniform1i(glGetUniformLocation(mProgram, name), value);
+  };
   void set(const char *name, glm::vec2 value) {
     glUniform2fv(glGetUniformLocation(mProgram, name), 1, glm::value_ptr(value));
   };
