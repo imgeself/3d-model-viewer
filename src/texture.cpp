@@ -2,6 +2,8 @@
 #include <gdkmm/pixbuf.h>
 #include <iostream>
 
+std::unordered_map<std::string, GLuint> Texture::mTexturePool;
+
 Texture::Texture(std::string path, TextureType type)
 {
   mType = type;

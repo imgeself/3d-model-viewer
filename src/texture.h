@@ -25,6 +25,4 @@ public:
   std::string getPath();
 };
 
-std::unordered_map<std::string, GLuint> Texture::mTexturePool;
-
 #endif

@@ -3,13 +3,11 @@
 #include <iostream>
 #include <vector>
 
-#include <GL/glew.h>
-
 Model::Model(std::string filename)
 { 
   Assimp::Importer import;
   import.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,1);
-  const aiScene* scene = import.ReadFile(filename, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_PreTransformVertices | aiProcess_Triangulate);
+  const aiScene* scene = import.ReadFile(filename, aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_PreTransformVertices | aiProcess_Triangulate | aiProcess_FlipUVs);
   if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
   {
     std::cout << "Error at loading model: " << import.GetErrorString() << "\n";
@@ -31,7 +29,7 @@ void Model::iterateNode(const aiNode *node, const aiScene *scene)
 
   for (int i = 0; i < node->mNumMeshes; i++) {
     aiMesh* mesh = scene->mMeshes[node->mMeshes[i]]; 
-    this->mMeshes.push_back(loadMesh(mesh, scene));			
+    mMeshes.push_back(loadMesh(mesh, scene));			
   }
 
   for (int i = 0; i < node->mNumChildren; i++) {
