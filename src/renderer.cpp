@@ -1,11 +1,8 @@
 #include "renderer.h"
 #include "shader.h"
-#include <chrono>
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-GLuint projLoc, modelLoc, viewLoc, inversedModelLoc, cameraPosLoc;
 Shader shader;
 
 Renderer::Renderer()
@@ -36,10 +33,8 @@ void Renderer::prepare()
  
   //Shader have open gl functions. So we have to compile shaders after initilazing glew.
   shader.compileShadersAndProgram();
+  shader.use();
   
-  glUseProgram(shader.mProgram);
-  
- 
   for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
     glGenVertexArrays(1, &mesh.mVAO);
     glGenBuffers(1, &mesh.mVBO);
@@ -81,20 +76,9 @@ void Renderer::prepare()
 
   mActiveScene.mainLight = light;
 
-  //We put this code in prepare bu later we might put in render
-  GLuint lightPosLoc = glGetUniformLocation(shader.mProgram, "lightPos");
-  GLuint lightColorLoc = glGetUniformLocation(shader.mProgram, "lightColor");
-  GLuint ambStrenLoc = glGetUniformLocation(shader.mProgram, "ambientStrength");
-
-  glUniform3fv(lightPosLoc, 1, glm::value_ptr(mActiveScene.mainLight.position));
-  glUniform3fv(lightColorLoc, 1, glm::value_ptr(mActiveScene.mainLight.color));
-  glUniform1f(ambStrenLoc, mActiveScene.mainLight.ambientStrength);
-
-  viewLoc = glGetUniformLocation(shader.mProgram, "view");
-  modelLoc = glGetUniformLocation(shader.mProgram, "model");
-  projLoc = glGetUniformLocation(shader.mProgram, "projection");
-  inversedModelLoc = glGetUniformLocation(shader.mProgram, "inversedModel");
-  cameraPosLoc = glGetUniformLocation(shader.mProgram, "cameraPos");
+  shader.set("lightPos", mActiveScene.mainLight.position);
+  shader.set("lightColor", mActiveScene.mainLight.color);
+  shader.set("ambientStrength", mActiveScene.mainLight.ambientStrength);
 }
 
 
@@ -103,18 +87,18 @@ void Renderer::render()
   glClearColor(0.2f,0.2f,0.2f,1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUseProgram(shader.mProgram);
+  shader.use();
   
   glm::mat4 view;
   view = glm::lookAt(mActiveScene.mainCamera.getPosition(), mActiveScene.mainCamera.getTarget(), mActiveScene.mainCamera.getUp());
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  shader.set("view", view);
 
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mActiveScene.mModel->getModelMatrix()));
+  shader.set("model", mActiveScene.mModel->getModelMatrix());
 
-  glUniform3fv(cameraPosLoc, 1, glm::value_ptr(mActiveScene.mainCamera.getPosition()));
+  shader.set("cameraPos", mActiveScene.mainCamera.getPosition());
 
   glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mModel->getModelMatrix())));
-  glUniformMatrix3fv(inversedModelLoc, 1, GL_FALSE, glm::value_ptr(inversedModel));
+  shader.set("inversedModel", inversedModel);
 
   for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
 
@@ -132,7 +116,7 @@ void Renderer::render()
 	break;
       }
       
-      glUniform1i(glGetUniformLocation(shader.mProgram, name), i);
+      shader.set(name, i);
       glBindTexture(GL_TEXTURE_2D, texture.getId());
     }
     
@@ -142,22 +126,22 @@ void Renderer::render()
     glBindVertexArray(0);
   }
 
-  glUseProgram(0);
+  shader.unuse();
 }  
 
 
 void Renderer::resize(int width, int height)
 {
   glViewport(0, 0, width, height);
-  glUseProgram(shader.mProgram);
+  shader.use();
   glm::mat4 projection = glm::perspective(glm::radians(50.0f), (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
-  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUseProgram(0);
+  shader.set("projection", projection);
+  shader.unuse();
 }  
 
 void Renderer::cleanUp()
 {
-  glDeleteProgram(shader.mProgram);
+  shader.release();
   
   for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
     glDeleteVertexArrays(1, &mesh.mVAO);

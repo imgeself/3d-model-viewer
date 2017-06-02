@@ -119,3 +119,18 @@ Shader::~Shader()
 {
 
 }
+
+void Shader::use()
+{
+  glUseProgram(mProgram);
+}
+
+void Shader::unuse()
+{
+  glUseProgram(0);
+}
+
+void Shader::release()
+{
+  glDeleteProgram(mProgram);
+}  
