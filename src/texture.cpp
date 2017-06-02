@@ -47,7 +47,14 @@ void Texture::load()
     
   }
 
-}  
+}
+
+void Texture::release()
+{
+  for (auto it : mTexturePool) {
+    glDeleteTextures(1, &it.second);
+  }
+}
 
 GLuint Texture::getId()
 {

@@ -20,6 +20,7 @@ private:
 public:
   Texture(std::string path, TextureType type);
   void load();
+  static void release();
   GLuint getId();
   TextureType getType();
   std::string getPath();

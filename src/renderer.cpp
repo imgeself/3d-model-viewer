@@ -164,5 +164,6 @@ void Renderer::cleanUp()
     glDeleteBuffers(1, &mesh.mVBO);
     glDeleteBuffers(1, &mesh.mEBO);
   }
- 
+
+  Texture::release();
 }  
