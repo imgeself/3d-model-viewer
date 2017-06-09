@@ -1,5 +1,7 @@
 #include "texture.h"
-#include <gdkmm/pixbuf.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <iostream>
 
 std::unordered_map<std::string, GLuint> Texture::mTexturePool;
@@ -10,28 +12,33 @@ Texture::Texture(std::string path, TextureType type)
   mPath = path;
 }
 
-/*
- * We are using gdk pixbuf for image loading. Since we are linking gdk lib for gui,
- * we do not need to use any other image loading lib.
- */
 void Texture::load()
 {
   auto search = mTexturePool.find(mPath);
   if (search != mTexturePool.end()) {
     // We loaded texture before.
     mId = search->second;
-  } else {
-  
+  }
+
+  else {
     try {
-      // pixBuf is wrapped aroun GLib refptr which some kind of smart pointer.
-      // don't delete pixBuf it automatically delete itself.
-      auto pixBuf = Gdk::Pixbuf::create_from_file(mPath);
+      int width, height, nrChannels;
+      unsigned char *data = stbi_load(mPath.c_str(), &width, &height, &nrChannels, 0);
+
+      GLenum channel;
+      if (nrChannels == 1)
+        channel = GL_RED;
+      else if (nrChannels == 3)
+        channel = GL_RGB;
+      else if (nrChannels == 4)
+        channel = GL_RGBA;
+
       glGenTextures(1, &mId);
       glBindTexture(GL_TEXTURE_2D, mId);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixBuf->get_width(),
-		   pixBuf->get_height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixBuf->get_pixels());
+      glTexImage2D(GL_TEXTURE_2D, 0, channel, width, height, 0,
+                   channel, GL_UNSIGNED_BYTE, data);
       glGenerateMipmap(GL_TEXTURE_2D);	
-    
+      stbi_image_free(data);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -40,9 +47,8 @@ void Texture::load()
 
       mTexturePool[mPath] = mId;
 
-    } catch(Gdk::PixbufError error) {
-      std::cout << "error at texture loading: \n" << "path: " << mPath << "\n"
-		<< error.what() << "\n";
+    } catch(...) {
+      std::cout << "error at texture loading: \n" << "path: " << mPath << "\n";
     }
     
   }
