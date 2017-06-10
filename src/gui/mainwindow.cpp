@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QDebug>
 
 RenderWidget *renderWidget;
 
@@ -10,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->settingsWidget->close();
     renderWidget = ui->renderWidget;
 }
 
@@ -39,4 +41,12 @@ void MainWindow::on_actionReset_Position_triggered()
     renderWidget->mModel.resetModelMatrix();
     renderWidget->mCamera.reset();
     renderWidget->update();
+}
+
+void MainWindow::on_actionSettings_triggered(bool checked)
+{
+    if (checked)
+        ui->settingsWidget->show();
+    else
+        ui->settingsWidget->close();
 }

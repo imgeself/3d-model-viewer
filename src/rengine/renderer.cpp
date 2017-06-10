@@ -99,7 +99,7 @@ void Renderer::render()
 
   glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mainModel->getModelMatrix())));
   shader.set("inversedModel", inversedModel);
-  qDebug() << "mesh count: " << mActiveScene.mainModel->mMeshes.size();
+
   for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
 
     for(int i = 0; i < mesh.mTextures.size(); i++) {
