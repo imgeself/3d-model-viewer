@@ -35,7 +35,7 @@ void Renderer::prepare()
   shader.compileShadersAndProgram();
   shader.use();
   
-  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
     glGenVertexArrays(1, &mesh.mVAO);
     glGenBuffers(1, &mesh.mVBO);
     glGenBuffers(1, &mesh.mEBO);
@@ -93,14 +93,14 @@ void Renderer::render()
   view = glm::lookAt(mActiveScene.mainCamera.getPosition(), mActiveScene.mainCamera.getTarget(), mActiveScene.mainCamera.getUp());
   shader.set("view", view);
 
-  shader.set("model", mActiveScene.mModel->getModelMatrix());
+  shader.set("model", mActiveScene.mainModel->getModelMatrix());
 
   shader.set("cameraPos", mActiveScene.mainCamera.getPosition());
 
-  glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mModel->getModelMatrix())));
+  glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mainModel->getModelMatrix())));
   shader.set("inversedModel", inversedModel);
-
-  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+  qDebug() << "mesh count: " << mActiveScene.mainModel->mMeshes.size();
+  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
 
     for(int i = 0; i < mesh.mTextures.size(); i++) {
       Texture texture = mesh.mTextures[i];
@@ -108,14 +108,14 @@ void Renderer::render()
       const char *name;
       glActiveTexture(GL_TEXTURE0 + i);
       switch (texture.getType()) {
-      case DIFFUSE:
-	name = "texture_diffuse";
-	shader.set("hasDiffuseMap", true);
-	break;
-      case SPECULAR:
-	name = "texture_specular";
-	shader.set("hasSpecularMap", true);
-	break;
+        case DIFFUSE:
+            name = "texture_diffuse";
+            shader.set("hasDiffuseMap", true);
+            break;
+        case SPECULAR:
+            name = "texture_specular";
+            shader.set("hasSpecularMap", true);
+            break;
       }
       
       shader.set(name, i);
@@ -145,7 +145,7 @@ void Renderer::cleanUp()
 {
   shader.release();
   
-  for (Mesh &mesh : mActiveScene.mModel->mMeshes) {
+  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
     glDeleteVertexArrays(1, &mesh.mVAO);
     glDeleteBuffers(1, &mesh.mVBO);
     glDeleteBuffers(1, &mesh.mEBO);

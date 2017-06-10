@@ -1,9 +1,4 @@
 #include "renderwidget.h"
-#include "../rengine/renderer.h"
-
-Renderer renderer = Renderer::getInstance();
-Model model("../../object/nanosuit.obj");
-Camera camera;
 
 RenderWidget::RenderWidget(QWidget *parent) :
     QOpenGLWidget(parent)
@@ -11,25 +6,30 @@ RenderWidget::RenderWidget(QWidget *parent) :
     setMouseTracking(true);
 }
 
+RenderWidget::~RenderWidget()
+{
+    mRenderer.cleanUp();
+}
+
 void RenderWidget::initializeGL()
 {
     makeCurrent();
-    Scene scene;
-    scene.mModel = &model;
-    scene.mainCamera = camera;
 
-    renderer.setActiveScene(scene);
-    renderer.prepare();
+    mScene.mainModel = &mModel;
+    mScene.mainCamera = mCamera;
+
+    mRenderer.setActiveScene(mScene);
+    mRenderer.prepare();
 }
 
 void RenderWidget::paintGL()
 {
-    renderer.render();
+    mRenderer.render();
 }
 
 void RenderWidget::resizeGL(int w, int h)
 {
-    renderer.resize(w,h);
+    mRenderer.resize(w,h);
 }
 
 Qt::MouseButton clickedButton = Qt::NoButton;
@@ -60,8 +60,8 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 
         xoffset *= sensitivity;
 
-        model.rotateHorizontally(xoffset);
-
+        mModel.rotateHorizontally(xoffset);
+        update();
     }
     // right click
     else if (clickedButton == Qt::RightButton) {
@@ -75,17 +75,17 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
         yoffset *= sensitivity * speed;
 
         if (xoffset > 0) {
-          camera.move(RIGHTWARD, xoffset);
+          mCamera.move(RIGHTWARD, xoffset);
         } else if (xoffset < 0){
-          camera.move(LEFTWARD, -xoffset);
+          mCamera.move(LEFTWARD, -xoffset);
         }
 
         if (yoffset > 0) {
-          camera.move(UPWARD, yoffset);
+          mCamera.move(UPWARD, yoffset);
         } else if (yoffset < 0){
-          camera.move(DOWNWARD, -yoffset);
+          mCamera.move(DOWNWARD, -yoffset);
         }
-
+        update();
     }
 
     // middle click
@@ -95,19 +95,20 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 
         yoffset *= sensitivity;
 
-        model.rotateVertically(yoffset);
+        mModel.rotateVertically(yoffset);
+        update();
     }
 
-    update();
+
 }
 
 void RenderWidget::wheelEvent(QWheelEvent *event)
 {
     float speed = event->delta() / 1000.0;
     if (speed >= 0) {
-        camera.move(FORWARD, speed);
+        mCamera.move(FORWARD, speed);
     } else {
-        camera.move(BACKWARD, -speed);
+        mCamera.move(BACKWARD, -speed);
     }
 
     update();

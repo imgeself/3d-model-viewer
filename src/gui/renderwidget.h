@@ -4,6 +4,8 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 
+#include "../rengine/renderer.h"
+
 #include <QOpenGLWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -18,14 +20,24 @@ class RenderWidget : public QOpenGLWidget
 
 public:
     RenderWidget(QWidget *parent = 0);
+    ~RenderWidget();
 
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
+
+
+    Renderer mRenderer = Renderer::getInstance();
+    Camera mCamera;
+    Model mModel;
+    Scene mScene;
+
+private:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+
 };
 
 #endif // RENDERWIDGET_H

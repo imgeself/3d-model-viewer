@@ -3,7 +3,17 @@
 #include <iostream>
 #include <vector>
 
-Model::Model(std::string filename)
+Model::Model()
+{
+
+}
+
+Model::~Model()
+{
+
+}
+
+void Model::loadFromFilename(std::string filename)
 { 
   Assimp::Importer import;
   import.SetPropertyInteger(AI_CONFIG_PP_PTV_NORMALIZE,1);
@@ -17,11 +27,6 @@ Model::Model(std::string filename)
   mCurrentFolder = filename.substr(0, filename.find_last_of("/"));
 
   iterateNode(scene->mRootNode, scene);
-}
-
-Model::~Model()
-{
-
 }
 
 void Model::iterateNode(const aiNode *node, const aiScene *scene)
@@ -144,7 +149,12 @@ void Model::rotateHorizontally(float angle)
 void Model::rotateVertically(float angle)
 {
   mModelMatrix = glm::rotate(mModelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));  
-}  
+}
+
+void Model::resetModelMatrix()
+{
+    mModelMatrix = glm::mat4();
+}
 
 glm::mat4 Model::getModelMatrix()
 {

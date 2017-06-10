@@ -17,12 +17,14 @@
 class Model {
 
 public:
-  Model(std::string filename);
+  Model();
   ~Model();
 
   std::vector<Mesh> mMeshes;
   void rotateHorizontally(float angle);
   void rotateVertically(float angle);
+  void loadFromFilename(std::string filename);
+  void resetModelMatrix();
   glm::mat4 getModelMatrix();
   
 private:

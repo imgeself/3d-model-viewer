@@ -16,6 +16,7 @@ class Camera {
 public:
   void move(CameraDirection dir, float speed);
   
+  void reset();
   glm::vec3 getTarget();
   glm::vec3 getUp();
   glm::vec3 getPosition();

@@ -17,7 +17,7 @@ struct Light {
 struct Scene {
   Camera mainCamera;
   Light mainLight;
-  Model *mModel = nullptr;
+  Model *mainModel = nullptr;
 };
 
 #endif
