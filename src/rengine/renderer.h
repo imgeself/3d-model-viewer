@@ -12,16 +12,20 @@ public:
   {
     static Renderer instance;
     return instance;
-  };
+  }
+
   void prepare();
   void cleanUp();
   void render();
   void resize(int width, int height);
   void setActiveScene(Scene &scene);
+
+  glm::vec3 mBackgroundColor{0.2f};
   
 private:
   Renderer();
-  Scene mActiveScene;
+  Scene *mActiveScene = nullptr;
+
 };
 
 #endif

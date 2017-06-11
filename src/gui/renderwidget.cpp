@@ -1,5 +1,5 @@
 #include "renderwidget.h"
-
+#include <QDebug>
 RenderWidget::RenderWidget(QWidget *parent) :
     QOpenGLWidget(parent)
 {
@@ -14,9 +14,6 @@ RenderWidget::~RenderWidget()
 void RenderWidget::initializeGL()
 {
     makeCurrent();
-
-    mScene.mainModel = &mModel;
-    mScene.mainCamera = mCamera;
 
     mRenderer.setActiveScene(mScene);
     mRenderer.prepare();
@@ -60,7 +57,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 
         xoffset *= sensitivity;
 
-        mModel.rotateHorizontally(xoffset);
+        mScene.mainModel.rotateHorizontally(xoffset);
         update();
     }
     // right click
@@ -75,15 +72,15 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
         yoffset *= sensitivity * speed;
 
         if (xoffset > 0) {
-          mCamera.move(RIGHTWARD, xoffset);
+          mScene.mainCamera.move(RIGHTWARD, xoffset);
         } else if (xoffset < 0){
-          mCamera.move(LEFTWARD, -xoffset);
+          mScene.mainCamera.move(LEFTWARD, -xoffset);
         }
 
         if (yoffset > 0) {
-          mCamera.move(UPWARD, yoffset);
+          mScene.mainCamera.move(UPWARD, yoffset);
         } else if (yoffset < 0){
-          mCamera.move(DOWNWARD, -yoffset);
+          mScene.mainCamera.move(DOWNWARD, -yoffset);
         }
         update();
     }
@@ -95,7 +92,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 
         yoffset *= sensitivity;
 
-        mModel.rotateVertically(yoffset);
+        mScene.mainModel.rotateVertically(yoffset);
         update();
     }
 
@@ -106,9 +103,9 @@ void RenderWidget::wheelEvent(QWheelEvent *event)
 {
     float speed = event->delta() / 1000.0;
     if (speed >= 0) {
-        mCamera.move(FORWARD, speed);
+        mScene.mainCamera.move(FORWARD, speed);
     } else {
-        mCamera.move(BACKWARD, -speed);
+        mScene.mainCamera.move(BACKWARD, -speed);
     }
 
     update();

@@ -28,8 +28,6 @@ public:
 
 
     Renderer mRenderer = Renderer::getInstance();
-    Camera mCamera;
-    Model mModel;
     Scene mScene;
 
 private:

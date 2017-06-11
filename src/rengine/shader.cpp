@@ -44,6 +44,7 @@ out vec4 color;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform float ambientStrength;
+uniform float specularStrength;
 
 uniform vec3 cameraPos;
 
@@ -52,8 +53,6 @@ uniform sampler2D texture_diffuse;
 
 uniform bool hasSpecularMap;
 uniform sampler2D texture_specular;
-
-float specularStrength = 0.5f;
 
 void main()
 {

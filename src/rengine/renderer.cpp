@@ -17,7 +17,7 @@ Renderer::~Renderer()
 
 void Renderer::setActiveScene(Scene &scene)
 {
-  mActiveScene = scene;
+  mActiveScene = &scene;
 }  
 
 
@@ -35,7 +35,7 @@ void Renderer::prepare()
   shader.compileShadersAndProgram();
   shader.use();
   
-  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
+  for (Mesh &mesh : mActiveScene->mainModel.mMeshes) {
     glGenVertexArrays(1, &mesh.mVAO);
     glGenBuffers(1, &mesh.mVBO);
     glGenBuffers(1, &mesh.mEBO);
@@ -68,39 +68,34 @@ void Renderer::prepare()
 
   }
 
-  
-  Light light;
-  light.position = glm::vec3(0.0f, 1.0f, 3.0f);
-  light.color = glm::vec3(1.5f);
-  light.ambientStrength = 0.5f;
-
-  mActiveScene.mainLight = light;
-
-  shader.set("lightPos", mActiveScene.mainLight.position);
-  shader.set("lightColor", mActiveScene.mainLight.color);
-  shader.set("ambientStrength", mActiveScene.mainLight.ambientStrength);
 }
 
 
 void Renderer::render()
 {
-  glClearColor(0.2f,0.2f,0.2f,1.0f);
+  glClearColor(mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   shader.use();
   
   glm::mat4 view;
-  view = glm::lookAt(mActiveScene.mainCamera.getPosition(), mActiveScene.mainCamera.getTarget(), mActiveScene.mainCamera.getUp());
+  view = glm::lookAt(mActiveScene->mainCamera.getPosition(), mActiveScene->mainCamera.getTarget(),
+                     mActiveScene->mainCamera.getUp());
   shader.set("view", view);
 
-  shader.set("model", mActiveScene.mainModel->getModelMatrix());
+  shader.set("model", mActiveScene->mainModel.getModelMatrix());
 
-  shader.set("cameraPos", mActiveScene.mainCamera.getPosition());
+  shader.set("cameraPos", mActiveScene->mainCamera.getPosition());
 
-  glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene.mainModel->getModelMatrix())));
+  glm::mat3 inversedModel = glm::mat3(glm::transpose(glm::inverse(mActiveScene->mainModel.getModelMatrix())));
   shader.set("inversedModel", inversedModel);
 
-  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
+  shader.set("lightPos", mActiveScene->mainLight.position);
+  shader.set("lightColor", mActiveScene->mainLight.color * mActiveScene->mainLight.intensity);
+  shader.set("ambientStrength", mActiveScene->mainLight.ambientStrength);
+  shader.set("specularStrength", mActiveScene->mainLight.specularStrength);
+
+  for (Mesh &mesh : mActiveScene->mainModel.mMeshes) {
 
     for(int i = 0; i < mesh.mTextures.size(); i++) {
       Texture texture = mesh.mTextures[i];
@@ -145,7 +140,7 @@ void Renderer::cleanUp()
 {
   shader.release();
   
-  for (Mesh &mesh : mActiveScene.mainModel->mMeshes) {
+  for (Mesh &mesh : mActiveScene->mainModel.mMeshes) {
     glDeleteVertexArrays(1, &mesh.mVAO);
     glDeleteBuffers(1, &mesh.mVBO);
     glDeleteBuffers(1, &mesh.mEBO);
