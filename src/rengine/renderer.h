@@ -21,6 +21,7 @@ public:
   void setActiveScene(Scene &scene);
 
   glm::vec3 mBackgroundColor{0.2f};
+  bool wireframeMode = false;
   
 private:
   Renderer();

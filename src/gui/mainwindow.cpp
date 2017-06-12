@@ -111,3 +111,9 @@ void MainWindow::on_bgColorButton_clicked()
     renderWidget->mRenderer.mBackgroundColor.z = (float) color.blueF();
     renderWidget->update();
 }
+
+void MainWindow::on_actionWireframe_triggered(bool checked)
+{
+    renderWidget->mRenderer.wireframeMode = checked;
+    renderWidget->update();
+}

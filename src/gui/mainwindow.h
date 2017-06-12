@@ -20,14 +20,11 @@ private slots:
     void on_actionReset_Position_triggered();
     void on_actionSettings_triggered(bool checked);
     void on_intensitySlider_sliderMoved(int position);
-
     void on_ambientSlider_sliderMoved(int position);
-
     void on_specularSlider_sliderMoved(int position);
-
     void on_lightColorButton_clicked();
-
     void on_bgColorButton_clicked();
+    void on_actionWireframe_triggered(bool checked);
 
 private:
     Ui::MainWindow *ui;

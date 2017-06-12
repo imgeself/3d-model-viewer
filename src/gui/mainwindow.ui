@@ -245,6 +245,7 @@
      <string>Edit</string>
     </property>
     <addaction name="actionReset_Position"/>
+    <addaction name="actionWireframe"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -272,6 +273,14 @@
    </property>
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionWireframe">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Wireframe</string>
    </property>
   </action>
  </widget>

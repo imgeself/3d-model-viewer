@@ -95,6 +95,11 @@ void Renderer::render()
   shader.set("ambientStrength", mActiveScene->mainLight.ambientStrength);
   shader.set("specularStrength", mActiveScene->mainLight.specularStrength);
 
+  if (wireframeMode)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  else
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
   for (Mesh &mesh : mActiveScene->mainModel.mMeshes) {
 
     for(int i = 0; i < mesh.mTextures.size(); i++) {
