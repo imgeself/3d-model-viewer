@@ -9,7 +9,7 @@ enum CameraDirection {
   DOWNWARD,
   UPWARD,
   RIGHTWARD,
-  LEFTWARD,
+  LEFTWARD
 };  
 
 class Camera {

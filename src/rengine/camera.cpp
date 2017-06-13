@@ -1,9 +1,9 @@
 #include "camera.h"
 
 glm::vec3 pos(0.0f, 0.0f, 2.5f);
-glm::vec3 forward(0.0f, 0.0f, -1.0f);
-glm::vec3 up(0.0f, 1.0f, 0.0f);
-glm::vec3 right(1.0f, 0.0f, 0.0f);
+const glm::vec3 forward(0.0f, 0.0f, -1.0f);
+const glm::vec3 up(0.0f, 1.0f, 0.0f);
+const glm::vec3 right(1.0f, 0.0f, 0.0f);
 
 void Camera::move(CameraDirection dir, float speed)
 {
@@ -21,10 +21,10 @@ void Camera::move(CameraDirection dir, float speed)
         pos -= up * speed;
         break;
       case RIGHTWARD:
-        pos += glm::normalize(glm::cross(forward, up)) * speed;
+        pos += right * speed;
         break;
       case LEFTWARD:
-        pos -= glm::normalize(glm::cross(forward, up)) * speed;
+        pos -= right * speed;
         break;
       default:
         break;

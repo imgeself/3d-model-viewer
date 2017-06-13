@@ -3,7 +3,6 @@
 
 #include <QFileDialog>
 #include <QColorDialog>
-#include <QDebug>
 
 RenderWidget *renderWidget;
 

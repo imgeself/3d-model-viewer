@@ -1,5 +1,5 @@
 #include "renderwidget.h"
-#include <QDebug>
+
 RenderWidget::RenderWidget(QWidget *parent) :
     QOpenGLWidget(parent)
 {
